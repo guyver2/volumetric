@@ -16,7 +16,7 @@ int main(int argc, char** argv )
     for (int i=0;i<100;i++) for (int j=0;j<100;j++) for (int k=0;k<100;k++)
     {
       float dist = sqrt((i-50)*(i-50) + (j-50)*(j-50) + (k-50)*(k-50));
-      volume(i,j,k) = 255*(dist/100);
+      volume(i,j,k) = 255*pow((100-dist)/100,4);
     }
     //volume(1,1,1) = 5;
     volume.toFile("vol.txt");
