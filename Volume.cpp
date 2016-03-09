@@ -148,4 +148,5 @@ template class Volume<float>;
 template class Volume<double>;
 template class Volume<int>;
 template class Volume<char>;
+template class Volume<unsigned char>;
 }
