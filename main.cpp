@@ -1,0 +1,46 @@
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+#include "Volume.hpp"
+
+using namespace vol;
+
+int main(int argc, char** argv )
+{
+  Volume<char> volume;//Volume<char>();
+  if ( argc != 2 )
+  {
+    std::cout << "usage: " << argv[0] << " dataFile.3d" << std::endl;
+    // default, create a sphere like object at the center with decreasing intensity value
+    volume = Volume<char>({100, 100, 100});
+    for (int i=0;i<100;i++) for (int j=0;j<100;j++) for (int k=0;k<100;k++)
+    {
+      float dist = sqrt((i-50)*(i-50) + (j-50)*(j-50) + (k-50)*(k-50));
+      volume(i,j,k) = 255*dist/100;
+    }
+    //volume(1,1,1) = 5;
+    volume.toFile("vol.txt");
+  } else {
+    volume.fromFile(std::string(argv[1]));
+  }
+  std::cout << volume.getShape() << std::endl;
+  
+  std::vector<char> slice;
+  for (int i=0; i<100; i++){
+    slice = volume.getSlice(i, 'd');
+    //*//opencv test stuff
+    cv::Mat image = cv::Mat(100, 100, cv::DataType<char>::type, &(slice[0]));
+
+    if ( !image.data )
+    {
+        std::cout << "No image data" << std::endl;
+        return -1;
+    }
+    cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
+    cv::imshow("Display Image", image);
+
+    cv::waitKey(0);
+  }
+    /**/
+    return 0;
+}
