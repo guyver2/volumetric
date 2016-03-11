@@ -2,6 +2,8 @@ CMakeCache.txt
 CMakeFiles/*
 Makefile
 Volume
+Viewer
 cmake_install.cmake
 vol.txt
-
+moc_*
+*_automoc*
