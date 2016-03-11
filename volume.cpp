@@ -1,4 +1,4 @@
-#include "Volume.hpp"
+#include "volume.hpp"
 
 #include <string>
 #include <vector>
@@ -10,12 +10,14 @@
 
 using namespace vol;
 
+// default constructor, empty data
 template <typename T>
 Volume<T>::Volume(): _data(std::vector<T>()),
                      _shape({0,0,0})
 {
 }
 
+// default constructor with given shape, fill data with zeros
 template <typename T>
 Volume<T>::Volume(shape s)
 {
@@ -23,13 +25,14 @@ Volume<T>::Volume(shape s)
   _data = std::vector<T>(s.w*s.h*s.d, 0);
 }
 
+// default destructor
 template <typename T>
 Volume<T>::~Volume()
 {
 }
 
 
-
+// convininent accessor with parenthesis
 template <typename T>
 T& Volume<T>::operator()(uint x, uint y, uint z)
 { // check if value is in range
@@ -41,25 +44,15 @@ T& Volume<T>::operator()(uint x, uint y, uint z)
   return _data[z*(_shape.w*_shape.h)+y*_shape.w+x];
 }
 
-/*
-template<T>
-const T& Volume<T>::operator()(uint x, uint y, uint z)
-const {
-  if (x>=_shape.w || y>=_shape.h || z>=_shape.d) {
-    std::cerr << "error accessing (" << x << ", " << y << ", " << z
-    << ") out of bound (" << _shape.w << ", " << _shape.h << ", "
-    << _shape.d << ")" << std::endl;
-  }
-  return _data[z*(_shape.w*_shape*h)+y*_shape.w+x];
-}
-*/
-
+// _shape accessor
 template <typename T>
 const shape Volume<T>::getShape()
 {
   return _shape;
 }
 
+
+// load data from file
 template <typename T>
 shape Volume<T>::fromFile(std::string filename)
 {
@@ -73,6 +66,7 @@ shape Volume<T>::fromFile(std::string filename)
     _data.push_back((T)d);
   }
   fd.close();
+  // check if data is consistent with the shape
   if (_data.size() != _shape.w*_shape.h*_shape.d){
     std::cout << "error loading file " << filename
     << ". Shape do not agree with data size. \n(" << _shape.w << ", "
@@ -84,6 +78,8 @@ shape Volume<T>::fromFile(std::string filename)
   return _shape;
 }
 
+
+// write data to file
 template <typename T>
 void Volume<T>::toFile(std::string filename)
 {
@@ -95,9 +91,11 @@ void Volume<T>::toFile(std::string filename)
 }
 
 
+// read data from a buffer
 template <typename T>
 shape Volume<T>::fromData(const std::vector<T> &data, shape s)
 {
+  // check if data and shape are consistent
   if (data.size() != s.w*s.h*s.d){
     std::cout << "error loading data "
     << ". Shape do not agree with data size. \n(" << s.w << ", "
@@ -112,6 +110,8 @@ shape Volume<T>::fromData(const std::vector<T> &data, shape s)
   return _shape;
 }
 
+
+// return a 2D slice of the volume from an axis and a slice ID
 template <typename T>
 std::vector<T> Volume<T>::getSlice(uint id, char axis)
 {
@@ -138,12 +138,12 @@ std::vector<T> Volume<T>::getSlice(uint id, char axis)
 
 // explicit instanciation
 namespace vol{
-  
+
   std::ostream& operator<<(std::ostream &strm, const shape &s) {
     return strm << "(" << s.w << ", " << s.h << ", " << s.d << ")";
   }
-  
-  
+
+
 template class Volume<float>;
 template class Volume<double>;
 template class Volume<int>;

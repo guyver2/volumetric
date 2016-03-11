@@ -1,7 +1,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-#include "Volume.hpp"
+#include "volume.hpp"
 
 using namespace vol;
 
@@ -36,6 +36,7 @@ int main(int argc, char** argv )
         std::cout << "No image data" << std::endl;
         return -1;
     }
+    cv::resize(image, image, {0,0}, 5, 5);
     cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
     cv::imshow("Display Image", image);
 
