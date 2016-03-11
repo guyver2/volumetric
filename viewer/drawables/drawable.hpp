@@ -1,8 +1,14 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
-#include "viewer.hpp"
 #include <QtCore>
+#include <QWidget>
+
+class Drawable;
+class ControlPanel;
+#include "util.h"
+#include "viewer.hpp"
+
 
 class Drawable : public QWidget{
   Q_OBJECT
@@ -20,13 +26,14 @@ public :
   virtual void setActive(bool);
   virtual void draw(); // draw content
   virtual void refresh(); // emit needsRefresh signal
+  virtual ControlPanel* controlPanel();
 
-private :
+protected :
   int _priority;
   p3d _center;
   float _radius;
   bool _active;
-  //ControlPanel _controlPanel;
+  ControlPanel* _controlPanel;
 };
 
 

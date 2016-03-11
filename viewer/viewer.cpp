@@ -1,5 +1,6 @@
 #include "viewer.hpp"
 #include "arcball.hpp"
+#include "drawables/drawable.hpp"
 
 #include <QtCore>
 #include <QtOpenGL/QGLWidget>
@@ -8,21 +9,23 @@
 #include <GL/gl.h>
 
 #include <iostream>
+#include <string>
 #include <cmath>
 
-Viewer::Viewer(): QGLWidget(),
-                  _parent(NULL),
+Viewer::Viewer(QWidget* parent): QGLWidget(parent),
+                  _parent(parent),
                   _bgColor({0.3,0.3,0.3,1}),
                   _crossColor({1,1,1,1}),
                   _showCross(true),
-                  _pos({0,0,-10}),
+                  _pos({0,0,-20}),
                   _focus({0,0,0}),
                   _fov(60),
                   _radius(10),
                   _zfar(200),
                   _arcball(Arcball()),
                   _oldMouseX(0),
-                  _oldMouseY(0)
+                  _oldMouseY(0),
+                  _drawables(std::map<std::string, Drawable*>())
 {
   _arcball.setWidthHeight(this->width(), this->height());
 }
@@ -45,6 +48,11 @@ void Viewer::paintGL()
   _arcball.applyRotationMatrix();
   if (_showCross){
     drawCross(_radius/20.0);
+  }
+  // display all drawable
+  for (DrawableIterator iter = _drawables.begin(); iter != _drawables.end(); iter++){
+    //std::cout << "Key: " << iter->first << std::endl;
+    iter->second->draw();
   }
 }
 
@@ -162,3 +170,17 @@ void Viewer::keyPressEvent(QKeyEvent* event)
         this->repaint();
   }
 }
+
+
+std::string Viewer::addDrawable(std::string name, Drawable *d)
+{
+  if (_drawables.count(name)){ // name already present, rename it
+    std::string newName = std::to_string(_drawables.size())+name;
+    _drawables[newName] = d;
+    return newName;
+  } else {
+    _drawables[name] = d;
+    return name;
+  }
+}
+

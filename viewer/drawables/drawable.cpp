@@ -8,12 +8,14 @@ Drawable::Drawable() : QWidget(),
                        _priority(1),
                        _center({0,0,0}),
                        _radius(10),
-                       _active(true)
+                       _active(true),
+                       _controlPanel(new ControlPanel(this))
 {
 }
 
 Drawable::~Drawable()
 {
+  delete _controlPanel;
 }
 
 int Drawable::priority()
@@ -51,6 +53,12 @@ void Drawable::refresh()
   emit needsRefresh();
 }
 
+ControlPanel* Drawable::controlPanel()
+{
+  return _controlPanel;
+}
+
+
 /*
  * Default control panel
  */
@@ -71,7 +79,6 @@ void ControlPanel::setActive(bool v)
   this->setEnabled(v);
   _drawable->refresh();
 }
-
 
 
 

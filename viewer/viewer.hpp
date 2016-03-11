@@ -1,40 +1,31 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include "util.h"
 #include "arcball.hpp"
+#include "drawables/drawable.hpp"
 
 #include <QtOpenGL/QGLWidget>
 
-typedef struct p3d{
-  double x;
-  double y;
-  double z;
-} p3d;
-
-typedef struct color{
-  float r;
-  float g;
-  float b;
-  float a;
-} color;
-
+typedef std::map<std::string, Drawable*>::const_iterator DrawableIterator;
 
 class Viewer : public QGLWidget
 {
   Q_OBJECT
   
   public :
-    Viewer();
+    Viewer(QWidget*);
     ~Viewer();
     virtual void paintGL();
     void drawCross(float);
-    virtual void  resizeGL(int, int);
+    virtual void resizeGL(int, int);
     virtual void wheelEvent(QWheelEvent*);
     virtual void mousePressEvent(QMouseEvent*);
     virtual void mouseReleaseEvent(QMouseEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
     virtual void keyPressEvent(QKeyEvent*);
     void zoom(float);
+    std::string addDrawable(std::string, Drawable*);
 
   private :
     QWidget* _parent;
@@ -49,6 +40,7 @@ class Viewer : public QGLWidget
     Arcball  _arcball;
     int      _oldMouseX;
     int      _oldMouseY;
+    std::map<std::string, Drawable*> _drawables;
 };
 
 
