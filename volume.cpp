@@ -8,7 +8,6 @@
 #include <iterator>
 
 
-using namespace vol;
 
 // default constructor, empty data
 template <typename T>
@@ -43,14 +42,6 @@ T& Volume<T>::operator()(uint x, uint y, uint z)
   }
   return _data[z*(_shape.w*_shape.h)+y*_shape.w+x];
 }
-
-// _shape accessor
-template <typename T>
-const shape Volume<T>::getShape()
-{
-  return _shape;
-}
-
 
 // load data from file
 template <typename T>
@@ -135,13 +126,9 @@ std::vector<T> Volume<T>::getSlice(uint id, char axis)
 }
 
 
-
-// explicit instanciation
-namespace vol{
-
-  std::ostream& operator<<(std::ostream &strm, const shape &s) {
-    return strm << "(" << s.w << ", " << s.h << ", " << s.d << ")";
-  }
+std::ostream& operator<<(std::ostream &strm, const shape &s) {
+  return strm << "(" << s.w << ", " << s.h << ", " << s.d << ")";
+}
 
 
 template class Volume<float>;
@@ -149,4 +136,3 @@ template class Volume<double>;
 template class Volume<int>;
 template class Volume<char>;
 template class Volume<unsigned char>;
-}

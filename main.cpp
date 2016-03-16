@@ -3,7 +3,11 @@
 
 #include "volume.hpp"
 
-using namespace vol;
+#include <QApplication>
+#include "viewer/viewWindow.hpp"
+#include "viewer/drawables/shape.hpp"
+#include "viewer/drawables/slice.hpp"
+
 
 int main(int argc, char** argv )
 {
@@ -25,10 +29,20 @@ int main(int argc, char** argv )
   }
   std::cout << volume.getShape() << std::endl;
   
+    QApplication app(argc, argv);
+    ViewerWindow mainWin;
+    //mainWin.addDrawable("cube1", new CubeDrawable({0,0,0}, 5, {0,1,0,1}));
+    //mainWin.addDrawable("cube1", new CubeDrawable({-2.5,-2.5,-2.5}, 2, {1,0,0,1}));
+    mainWin.addDrawable("world", new WorldPlaneDrawable(1, 10, 'y'));
+    mainWin.addDrawable("vol", new Slice(&volume));
+    mainWin.show();
+    return app.exec();
+  
+  /*
   std::vector<unsigned char> slice;
   for (int i=0; i<100; i++){
     slice = volume.getSlice(i, 'd');
-    //*//opencv test stuff
+    //opencv test stuff
     cv::Mat image = cv::Mat(100, 100, cv::DataType<unsigned char>::type, &(slice[0]));
 
     if ( !image.data )

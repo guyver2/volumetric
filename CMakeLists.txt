@@ -30,6 +30,6 @@ target_link_libraries(Viewer Qt4::QtGui Qt4::QtOpenGL Qt4::QtCore GL GLU)
 
 find_package( OpenCV REQUIRED )
 
-add_executable(Volume main.cpp volume.cpp)
-target_link_libraries (Volume ${OpenCV_LIBS})
+add_executable(Volume main.cpp volume.cpp ${viewer_SRC}  ${drawables_SRC})
+target_link_libraries (Volume ${OpenCV_LIBS} Qt4::QtGui Qt4::QtOpenGL Qt4::QtCore GL GLU)
 

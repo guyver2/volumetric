@@ -14,7 +14,7 @@ class Viewer : public QGLWidget
   Q_OBJECT
   
   public :
-    Viewer(QWidget*);
+    Viewer(QWidget* parent=NULL, int W=600, int H=480);
     ~Viewer();
     virtual void paintGL();
     void drawCross(float);
@@ -26,6 +26,8 @@ class Viewer : public QGLWidget
     virtual void keyPressEvent(QKeyEvent*);
     void zoom(float);
     std::string addDrawable(std::string, Drawable*);
+    void focusAll();
+    void focusOn(p3d, float);
 
   private :
     QWidget* _parent;

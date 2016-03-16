@@ -9,10 +9,11 @@
 #include <GL/gl.h>
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <cmath>
 
-Viewer::Viewer(QWidget* parent): QGLWidget(parent),
+Viewer::Viewer(QWidget* parent, int W, int H): QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
                   _parent(parent),
                   _bgColor({0.3,0.3,0.3,1}),
                   _crossColor({1,1,1,1}),
@@ -28,6 +29,8 @@ Viewer::Viewer(QWidget* parent): QGLWidget(parent),
                   _drawables(std::map<std::string, Drawable*>())
 {
   _arcball.setWidthHeight(this->width(), this->height());
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->resize(W, H);
 }
 
 Viewer::~Viewer()
@@ -56,7 +59,7 @@ void Viewer::paintGL()
   }
 }
 
-
+// draw a 3D cross that shows world origin / scale / orientation
 void Viewer::drawCross(float s)
 {
   glLineStipple(1, 0xAAAA);
@@ -174,13 +177,56 @@ void Viewer::keyPressEvent(QKeyEvent* event)
 
 std::string Viewer::addDrawable(std::string name, Drawable *d)
 {
+  connect(d, SIGNAL(needsRefresh()), this, SLOT(repaint()));
   if (_drawables.count(name)){ // name already present, rename it
     std::string newName = std::to_string(_drawables.size())+name;
     _drawables[newName] = d;
+    focusAll();
     return newName;
   } else {
     _drawables[name] = d;
+    focusAll();
     return name;
   }
+}
+
+void Viewer::focusAll()
+{
+  if (_drawables.size() == 0){
+    focusOn({0,0,0}, 50);
+  } else {
+    std::vector<float> Xs;
+    std::vector<float> Ys;
+    std::vector<float> Zs;
+    for (DrawableIterator iter = _drawables.begin(); iter != _drawables.end(); iter++){
+      Drawable *d = iter->second;
+      Xs.push_back(d->center().x-d->radius());
+      Xs.push_back(d->center().x+d->radius());
+      Ys.push_back(d->center().y-d->radius());
+      Ys.push_back(d->center().y+d->radius());
+      Zs.push_back(d->center().z-d->radius());
+      Zs.push_back(d->center().z+d->radius());
+    }
+    std::vector<float>::iterator xmin = std::min_element(std::begin(Xs), std::end(Xs));
+    std::vector<float>::iterator xmax = std::max_element(std::begin(Xs), std::end(Xs));
+    std::vector<float>::iterator ymin = std::min_element(std::begin(Ys), std::end(Ys));
+    std::vector<float>::iterator ymax = std::max_element(std::begin(Ys), std::end(Ys));
+    std::vector<float>::iterator zmin = std::min_element(std::begin(Zs), std::end(Zs));
+    std::vector<float>::iterator zmax = std::max_element(std::begin(Zs), std::end(Zs));
+    
+    float radius = fmax(fmax(*xmax- *xmin, *ymax-*ymin), *zmax - *zmin);
+    p3d newCenter = {(*xmax+ *xmin)/2.,(*ymax+ *ymin)/2.,(*zmax+ *zmin)/2.};
+    focusOn(newCenter, radius);
+  }
+}
+void Viewer::focusOn(p3d center, float radius)
+{
+  std::cout << "focusing on (" << center.x << ", " << center.y << ", " << center.z << ") "
+            << "with radius : " << radius << std::endl;
+  _focus = center;
+  _radius = radius;
+  _zfar = 10*radius;
+  _pos.z = -1.5*radius;
+  this->updateGL();
 }
 

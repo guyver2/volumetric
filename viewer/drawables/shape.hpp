@@ -1,6 +1,7 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
+#include <iostream>
 #include "GL/gl.h"
 
 #include "drawable.hpp"
@@ -52,50 +53,53 @@ private :
   std::vector<float> _vertices;
   std::vector<unsigned char> _indices;
 };
-/*
-# Z = 0 plane
-class WorldDrawable(Drawable):
-  def __init__(self, size, nb):
-    super(WorldDrawable, self).__init__()
-    self.size = size
-    self.nb = nb
-    self.radius = 2*nb*size
-    self.center = [0,0,0]
 
-  def draw(self):
-    GL.glMatrixMode(GL.GL_MODELVIEW)
-    GL.glPushMatrix()
-    #GL.glLoadIdentity()
-    GL.glColor(*[0.7, 0.7, 0.7])
-    GL.glBegin(GL.GL_LINES)
-    shift = -self.size * self.nb/2.
-    # grid
-    for i in xrange(self.nb+1):
-      GL.glVertex(shift + self.size*i,  shift, 0)
-      GL.glVertex(shift + self.size*i, -shift, 0)
+// Y = 0 plane
+class WorldPlaneDrawable : public Drawable
+{
+public:
+  WorldPlaneDrawable(float size, int nb, char axis) : Drawable()
+  {
+    _size = size;
+    _radius = 2*nb*size;
+    _nb = nb;
+    _center = {0,0,0};
+    if (axis == 'x' || axis == 'y' || axis == 'z'){
+      _axis = axis;
+    } else {
+      std::cerr << "Error, unknown axis '" << axis <<"', using 'y' axis instead." << std::endl;
+      _axis = 'y';
+    }
+    
+  }
 
-      GL.glVertex( shift, shift + self.size*i, 0)
-      GL.glVertex(-shift, shift + self.size*i, 0)
+  void draw()
+  {
+    if (!_active) return;
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    if (_axis == 'y') glRotatef(90, 1, 0, 0);
+    else if (_axis == 'x') glRotatef(90, 0, 1, 0);
+    glColor4f(0.8, 0.8, 0.8, 1);
+    glBegin(GL_LINES);
+    float shift = -_size * _nb/2.;
+    // grid
+    for(int i=0; i<_nb+1; i++){
+      glVertex3f(shift + _size*i,  shift, 0);
+      glVertex3f(shift + _size*i, -shift, 0);
 
-    GL.glEnd()
+      glVertex3f( shift, shift + _size*i, 0);
+      glVertex3f(-shift, shift + _size*i, 0);
+    }
+    glEnd();
+    glPopMatrix();
+  }
+  
+private :
+  float _size;
+  int _nb;
+  char _axis;
 
-    # frame
-    GL.glLineWidth(1.5)
-    GL.glBegin(GL.GL_LINES)
-    GL.glColor(*[1, 0, 0])
-    GL.glVertex(0,  0, 0)
-    GL.glVertex(self.size, 0, 0)
-    GL.glColor(*[0, 1, 0])
-    GL.glVertex(0,  0, 0)
-    GL.glVertex(0, self.size, 0)
-    GL.glColor(*[0, 0, 1])
-    GL.glVertex(0,  0, 0)
-    GL.glVertex(0, 0, self.size)
+};
 
-    GL.glEnd()
-    GL.glLineWidth(1)
-
-    GL.glPopMatrix()
-*/
-
-#endif // SHAPES_H
+#endif // SHAPfES_H
