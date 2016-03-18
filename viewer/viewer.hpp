@@ -12,7 +12,7 @@ typedef std::map<std::string, Drawable*>::const_iterator DrawableIterator;
 class Viewer : public QGLWidget
 {
   Q_OBJECT
-  
+
   public :
     Viewer(QWidget* parent=NULL, int W=600, int H=480);
     ~Viewer();

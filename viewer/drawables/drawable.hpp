@@ -39,13 +39,13 @@ protected :
 
 
 class ControlPanel : public QWidget{
-
+  Q_OBJECT
 public :
       ControlPanel(Drawable*, QWidget* parent=NULL);
       ~ControlPanel();
       virtual void setActive(bool);
 
-private :
+protected :
     Drawable* _drawable;
     QWidget*  _parent;
 };

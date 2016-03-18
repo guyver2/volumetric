@@ -28,7 +28,7 @@ int main(int argc, char** argv )
     volume.fromFile(std::string(argv[1]));
   }
   std::cout << volume.getShape() << std::endl;
-  
+
     QApplication app(argc, argv);
     ViewerWindow mainWin;
     //mainWin.addDrawable("cube1", new CubeDrawable({0,0,0}, 5, {0,1,0,1}));
@@ -37,11 +37,11 @@ int main(int argc, char** argv )
     mainWin.addDrawable("vol", new Slice(&volume));
     mainWin.show();
     return app.exec();
-  
+
   /*
   std::vector<unsigned char> slice;
   for (int i=0; i<100; i++){
-    slice = volume.getSlice(i, 'd');
+    slice = volume.getSlice(i, 'w');
     //opencv test stuff
     cv::Mat image = cv::Mat(100, 100, cv::DataType<unsigned char>::type, &(slice[0]));
 
