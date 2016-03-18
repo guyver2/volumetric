@@ -221,8 +221,8 @@ void Viewer::focusAll()
 }
 void Viewer::focusOn(p3d center, float radius)
 {
-  std::cout << "focusing on (" << center.x << ", " << center.y << ", " << center.z << ") "
-            << "with radius : " << radius << std::endl;
+  //std::cout << "focusing on (" << center.x << ", " << center.y << ", " << center.z << ") "
+  //          << "with radius : " << radius << std::endl;
   _focus = center;
   _radius = radius;
   _zfar = 10*radius;

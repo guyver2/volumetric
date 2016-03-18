@@ -18,11 +18,13 @@ typedef struct shape{
 // forward declaration, see Volume.cpp for definition
 std::ostream& operator<<(std::ostream &, const shape&);
 
-/*
- s td*::ostream& operator<<(std::ostream &strm, const shape &s) {
- return strm << "(" << s.w << ", " << s.h << ", " << s.d << ")";
- }*/
-
+// shape of a 3D volume
+template<typename T>
+struct slice2d{
+  uint w; // width
+  uint h; // height
+  std::vector<T> data;
+};
 
 template <typename T>
 class Volume{
@@ -38,7 +40,7 @@ public :
   shape fromFile(std::string); // load volume from file
   void toFile(std::string); // save Volume to file
   shape fromData(const std::vector<T>&, shape); // load volume from data
-  std::vector<T> getSlice(uint, char); // get a 2D slice along a given dimension
+  struct slice2d<T> getSlice(uint, char); // get a 2D slice along a given dimension
   // accessor
   T& operator()(uint, uint, uint);
   //const T& operator()(uint, uint, uint);
@@ -146,26 +148,32 @@ shape Volume<T>::fromData(const std::vector<T> &data, shape s)
 
 // return a 2D slice of the volume from an axis and a slice ID
 template <typename T>
-std::vector<T> Volume<T>::getSlice(uint id, char axis)
+struct slice2d<T> Volume<T>::getSlice(uint id, char axis)
 {
-  std::vector<T> res;
+  struct slice2d<T> res;
   switch(axis){
     case 'w':
+      res.w = _shape.d;
+      res.h = _shape.h;
       for(int i=0; i<_shape.h; i++){
         for (int j=0; j<_shape.d; j++){
-          res.push_back(_data.at((j*_shape.w*_shape.h)+(i*_shape.w)+id));
+          res.data.push_back(_data.at((j*_shape.w*_shape.h)+(i*_shape.w)+id));
         }
       }
       break;
     case 'h':
+      res.w = _shape.d;
+      res.h = _shape.w;
       for(int i=0; i<_shape.d; i++){
         auto start = _data.begin()+(i*_shape.w*_shape.h) + id*_shape.w;
         auto end = start+_shape.w;
-        res.insert(res.end(), start, end);
+        res.data.insert(res.data.end(), start, end);
       }
       break;
     case 'd':
-      res = std::vector<T>(_data.begin()+(id*_shape.w*_shape.h), 
+      res.w = _shape.w;
+      res.h = _shape.h;
+      res.data = std::vector<T>(_data.begin()+(id*_shape.w*_shape.h), 
                            _data.begin()+((id+1)*_shape.w*_shape.h));
       break;
     default:

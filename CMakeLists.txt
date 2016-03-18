@@ -11,6 +11,10 @@ include_directories(/usr/include/qt4 )
 
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer/drawables)
+
+
 
 file(GLOB viewer_SRC
      "volume.cpp"
@@ -22,10 +26,8 @@ file(GLOB drawables_SRC
     "viewer/drawables/*.hpp"
     "viewer/drawables/*.cpp"
 )
-add_executable(Viewer viewer/main.cpp ${viewer_SRC}  ${drawables_SRC})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer/drawables)
-target_link_libraries(Viewer Qt4::QtGui Qt4::QtOpenGL Qt4::QtCore GL GLU)
+#add_executable(Viewer viewer/main.cpp ${viewer_SRC}  ${drawables_SRC})
+#target_link_libraries(Viewer Qt4::QtGui Qt4::QtOpenGL Qt4::QtCore GL GLU)
 
 
 #find_package (Threads) # -> ${CMAKE_THREAD_LIBS_INIT}
