@@ -16,17 +16,19 @@ int main(int argc, char** argv )
   {
     std::cout << "usage: " << argv[0] << " dataFile.3d" << std::endl;
     // default, create a sphere like object at the center with decreasing intensity value
-    volume = Volume<unsigned char>({100, 100, 100});
-    for (int i=0;i<100;i++) for (int j=0;j<100;j++) for (int k=0;k<100;k++)
+    volume = Volume<unsigned char>({100, 50, 25});
+    for (int i=0;i<100;i++) for (int j=0;j<50;j++) for (int k=0;k<25;k++)
     {
-      float dist = sqrt((i-50)*(i-50) + (j-50)*(j-50) + (k-50)*(k-50));
-      volume(i,j,k) = 255*pow((100-dist)/100,4);
+      //float dist = sqrt((i-50)*(i-50) + (j-50)*(j-50) + (k-50)*(k-50));
+      //volume(i,j,k) = 255*pow((100-dist)/100,4);
     }
-    //volume(1,1,1) = 5;
-    volume.toFile("vol.txt");
+    for(int i=0; i<25; i++) volume(i,i,i)=255;
+    //volume.toFile_bin("vol.dat");
   } else {
-    volume.fromFile(std::string(argv[1]));
+    volume.fromFile_bin(std::string(argv[1]));
   }
+  //Volume<unsigned char> vol2 = Volume<unsigned char>({1000,500,250}, 128);
+  //vol2.toFile("vol_perlin.txt");
   //std::cout << volume.getShape() << std::endl;
 #if true
     QApplication app(argc, argv);
@@ -35,14 +37,15 @@ int main(int argc, char** argv )
     //mainWin.addDrawable("cube1", new CubeDrawable({-2.5,-2.5,-2.5}, 2, {1,0,0,1}));
     //mainWin.addDrawable("world", new WorldPlaneDrawable(1, 10, 'y'));
     mainWin.addDrawable("vol", new Slice(&volume));
+    //mainWin.addDrawable("vol", new Slice(&vol2));
     mainWin.show();
     return app.exec();
 #else 
   //*
   for (int i=0; i<100; i++){
-    auto slice = volume.getSlice(i, 'w');
+    auto slice = volume.getSlice(i, 'h');
     //opencv test stuff
-    cv::Mat image = cv::Mat(100, 100, cv::DataType<unsigned char>::type, slice.data.data());
+    cv::Mat image = cv::Mat(50, 25, cv::DataType<unsigned char>::type, slice.data.data());
 
     if ( !image.data )
     {

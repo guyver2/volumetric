@@ -28,7 +28,7 @@ int printOglError(const char* file, int line)
 Slice::Slice(Volume<unsigned char> *vol) : Drawable(),
                             _volume(vol),
                             _alpha(0.9),
-                            _slices(std::vector<int>(3,50)),
+                            _slices(std::vector<int>(3,0)),
                             _visible(std::vector<bool>(3,true)),
                             _textures(std::vector<GLuint>(3,0)),
                             _maxIntTextures(std::vector<GLuint>(3,0)),
@@ -158,8 +158,8 @@ void Slice::drawSlice()
     glBegin(GL_LINE_LOOP);
     glVertex3f(0,0,z);
     glVertex3f(0,s.h,z);
-    glVertex3f(s.d,s.h,z);
-    glVertex3f(s.d,0,z);
+    glVertex3f(s.w,s.h,z);
+    glVertex3f(s.w,0,z);
     glEnd();
   }
   
@@ -196,11 +196,11 @@ void Slice::drawSlice()
     glBegin(GL_QUADS);
     glTexCoord2d(0,0);
     glVertex3f(0,y,0);
-    glTexCoord2d(0,1);
+    glTexCoord2d(1,0);
     glVertex3f(s.w,y,0);
     glTexCoord2d(1,1);
     glVertex3f(s.w,y,s.d);
-    glTexCoord2d(1,0);
+    glTexCoord2d(0,1);
     glVertex3f(0,y,s.d);
     glEnd();
   }
@@ -305,11 +305,11 @@ GLuint Slice::sliceToTexture(slice2dUC &slice)
   glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, slice.h, slice.w, 0,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, slice.w, slice.h, 0,
                GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);//static_cast<void*>(slice.data.data()));
   glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
-                   slice.h,
                    slice.w,
+                   slice.h,
                    GL_LUMINANCE,
                    GL_UNSIGNED_BYTE,
                    static_cast<void*>(slice.data.data()));
