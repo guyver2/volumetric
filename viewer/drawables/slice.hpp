@@ -1,5 +1,5 @@
-#ifndef SLICE_H
-#define SLICE_H
+#ifndef SLICE_DRAWABLE_H
+#define SLICE_DRAWABLE_H
 
 #include <QGridLayout>
 #include <QCheckBox>
@@ -18,11 +18,11 @@
 typedef struct slice2d<unsigned char> slice2dUC;
 
 
-class Slice : public Drawable
+class SliceDrawable : public Drawable
 {
 public :
-  Slice(Volume<unsigned char>*);
-  ~Slice();
+  SliceDrawable(Volume<unsigned char>*);
+  ~SliceDrawable();
   virtual void draw();
   const shape getVolumeShape();
   void changeSlice(char, int);
@@ -52,12 +52,12 @@ private :
 
 
 
-class SliceControlPanel : public ControlPanel 
+class SliceDrawableControlPanel : public ControlPanel 
 {
   Q_OBJECT
 public :
-  SliceControlPanel(Drawable*, QWidget* parent=NULL);
-  ~SliceControlPanel();
+  SliceDrawableControlPanel(Drawable*, QWidget* parent=NULL);
+  ~SliceDrawableControlPanel();
 public slots:
   void changeSliceX(int);
   void changeSliceY(int);
@@ -85,4 +85,4 @@ private :
 };
 
 
-#endif // SLICE_H
+#endif // SLICE_DRAWABLE_H

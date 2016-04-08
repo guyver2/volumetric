@@ -7,11 +7,12 @@
 #include "viewer/viewWindow.hpp"
 #include "viewer/drawables/shape.hpp"
 #include "viewer/drawables/slice.hpp"
+#include "viewer/drawables/mesh.hpp"
 
 
 int main(int argc, char** argv )
 {
-  Volume<unsigned char> volume;//Volume<char>();
+  /*Volume<unsigned char> volume;//Volume<char>();
   if ( argc != 2 )
   {
     std::cout << "usage: " << argv[0] << " dataFile.3d" << std::endl;
@@ -30,14 +31,19 @@ int main(int argc, char** argv )
   //Volume<unsigned char> vol2 = Volume<unsigned char>({1000,500,250}, 128);
   //vol2.toFile("vol_perlin.txt");
   //std::cout << volume.getShape() << std::endl;
+  */
 #if true
     QApplication app(argc, argv);
     ViewerWindow mainWin;
     //mainWin.addDrawable("cube1", new CubeDrawable({0,0,0}, 5, {0,1,0,1}));
     //mainWin.addDrawable("cube1", new CubeDrawable({-2.5,-2.5,-2.5}, 2, {1,0,0,1}));
     //mainWin.addDrawable("world", new WorldPlaneDrawable(1, 10, 'y'));
-    mainWin.addDrawable("vol", new Slice(&volume));
-    //mainWin.addDrawable("vol", new Slice(&vol2));
+    //mainWin.addDrawable("vol", new SliceDrawable(&volume));
+    mainWin.addDrawable("mesh", new MeshDrawable("/home/letouzea/downloads/4drep/antoine_lucie1/Models/Off/model_0000010000.off"));
+    /*std::vector<std::string> filenames;
+    for (int i=1; i<argc; i++) filenames.push_back(std::string(argv[i]));
+    mainWin.addDrawable("mesh", new MeshSeqDrawable(filenames));
+    */
     mainWin.show();
     return app.exec();
 #else 

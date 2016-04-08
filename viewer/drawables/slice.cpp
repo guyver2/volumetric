@@ -2,6 +2,8 @@
 #include "volume.hpp"
 #include <iostream>
 #include <vector>
+#include <GL/gl.h>
+
 
 #define printOpenGLError() printOglError(__FILE__, __LINE__)
 
@@ -25,7 +27,7 @@ int printOglError(const char* file, int line)
 
 //std::ostream& operator<<(std::ostream &, const shape&);
 
-Slice::Slice(Volume<unsigned char> *vol) : Drawable(),
+SliceDrawable::SliceDrawable(Volume<unsigned char> *vol) : Drawable(),
                             _volume(vol),
                             _alpha(0.9),
                             _slices(std::vector<int>(3,0)),
@@ -35,40 +37,40 @@ Slice::Slice(Volume<unsigned char> *vol) : Drawable(),
                             _showMaxInt(false)
 {
   delete _controlPanel;
-  _controlPanel = new SliceControlPanel(this);
+  _controlPanel = new SliceDrawableControlPanel(this);
   const shape s = _volume->getShape();
   _center = {0,0,0};
   _radius = fmax(fmax(s.w, s.h), s.d);
 }
 
-Slice::~Slice()
+SliceDrawable::~SliceDrawable()
 {
 }
 
-void Slice::setAlpha(float a)
+void SliceDrawable::setAlpha(float a)
 {
   _alpha = a;
   refresh();
 }
 
-float Slice::getAlpha()
+float SliceDrawable::getAlpha()
 {
   return _alpha;
 }
 
-void Slice::setMaxInt(int a)
+void SliceDrawable::setMaxInt(int a)
 {
   _showMaxInt = a;
   refresh();
 }
 
-bool Slice::getMaxInt()
+bool SliceDrawable::getMaxInt()
 {
   return _showMaxInt;
 }
 
 
-int Slice::getSlice(char s)
+int SliceDrawable::getSlice(char s)
 {
   switch (s) {
     case 'w':
@@ -78,19 +80,19 @@ int Slice::getSlice(char s)
     case 'd':
       return _slices[2];
     default:
-      std::cerr << "Error : Unknown axis : " << s << " for 3d volume in 'getSlice'" << std::endl;
+      std::cerr << "Error : Unknown axis : " << s << " for 3d volume in 'getSliceDrawable'" << std::endl;
       return 0;
   }
 }
 
 
-void Slice::draw()
+void SliceDrawable::draw()
 {
   drawBoundingBox();
   drawSlice();
 }
 
-void Slice::drawBoundingBox()
+void SliceDrawable::drawBoundingBox()
 {
   glLineStipple(1, 0x000F);
   glEnable(GL_LINE_STIPPLE);
@@ -120,7 +122,7 @@ void Slice::drawBoundingBox()
 }
 
 
-void Slice::drawSlice()
+void SliceDrawable::drawSlice()
 {
   const shape s = _volume->getShape();
   
@@ -229,14 +231,14 @@ void Slice::drawSlice()
   glPopMatrix();
 }
 
-const shape Slice::getVolumeShape()
+const shape SliceDrawable::getVolumeShape()
 {
   return _volume->getShape();
 }
 
 
 
-void Slice::changeSlice(char s, int id)
+void SliceDrawable::changeSlice(char s, int id)
 {
   if (s == 'w') {
     _slices[0] = id;
@@ -266,7 +268,7 @@ void Slice::changeSlice(char s, int id)
 }
 
 
-void Slice::setVisible(int id, int state)
+void SliceDrawable::setVisible(int id, int state)
 {
   if (id<0 || id>2) {
     std::cerr << "Error : Invalid index for slice in setVisible : " << id << std::endl;
@@ -276,7 +278,7 @@ void Slice::setVisible(int id, int state)
   }
 }
 
-bool Slice::getVisible(int id)
+bool SliceDrawable::getVisible(int id)
 {
   if (id<0 || id>2) {
     std::cerr << "Error : Invalid index for slice in setVisible : " << id << std::endl;
@@ -287,14 +289,14 @@ bool Slice::getVisible(int id)
 }
 
 
-void Slice::buildMaxIntensityTextures()
+void SliceDrawable::buildMaxIntensityTextures()
 {
   // max intensity on X
   
 }
 
 
-GLuint Slice::sliceToTexture(slice2dUC &slice)
+GLuint SliceDrawable::sliceToTexture(slice2dUC &slice)
 {
   GLuint texId;
   glGenTextures(1, &texId);
@@ -324,7 +326,7 @@ GLuint Slice::sliceToTexture(slice2dUC &slice)
 
 
 
-SliceControlPanel::SliceControlPanel(Drawable* d, QWidget* parent) :
+SliceDrawableControlPanel::SliceDrawableControlPanel(Drawable* d, QWidget* parent) :
                    ControlPanel(d, parent),
                    _checkX(new QCheckBox("X Slice", this)),
                    _checkY(new QCheckBox("Y Slice", this)),
@@ -340,11 +342,11 @@ SliceControlPanel::SliceControlPanel(Drawable* d, QWidget* parent) :
                    _labelA(new QLabel("Alpha :", this)),
                    _layout(new QGridLayout(this))
 {
-  _checkX->setCheckState(static_cast<Slice*>(_drawable)->getVisible(0)?Qt::Checked:Qt::Unchecked);
-  _checkY->setCheckState(static_cast<Slice*>(_drawable)->getVisible(1)?Qt::Checked:Qt::Unchecked);
-  _checkZ->setCheckState(static_cast<Slice*>(_drawable)->getVisible(2)?Qt::Checked:Qt::Unchecked);
-  _maxInt->setCheckState(static_cast<Slice*>(_drawable)->getMaxInt()?Qt::Checked:Qt::Unchecked);
-  shape s = static_cast<Slice*>(_drawable)->getVolumeShape();
+  _checkX->setCheckState(static_cast<SliceDrawable*>(_drawable)->getVisible(0)?Qt::Checked:Qt::Unchecked);
+  _checkY->setCheckState(static_cast<SliceDrawable*>(_drawable)->getVisible(1)?Qt::Checked:Qt::Unchecked);
+  _checkZ->setCheckState(static_cast<SliceDrawable*>(_drawable)->getVisible(2)?Qt::Checked:Qt::Unchecked);
+  _maxInt->setCheckState(static_cast<SliceDrawable*>(_drawable)->getMaxInt()?Qt::Checked:Qt::Unchecked);
+  shape s = static_cast<SliceDrawable*>(_drawable)->getVolumeShape();
   _spinX->setRange(0, s.w-1);
   _spinY->setRange(0, s.h-1);
   _spinZ->setRange(0, s.d-1);
@@ -352,13 +354,13 @@ SliceControlPanel::SliceControlPanel(Drawable* d, QWidget* parent) :
   _sliderY->setRange(0, s.h-1);
   _sliderZ->setRange(0, s.d-1);
   _sliderA->setRange(0, 100);
-  _sliderX->setValue(static_cast<Slice*>(_drawable)->getSlice('w'));
-  _spinX->setValue(static_cast<Slice*>(_drawable)->getSlice('w'));
-  _sliderY->setValue(static_cast<Slice*>(_drawable)->getSlice('h'));
-  _spinY->setValue(static_cast<Slice*>(_drawable)->getSlice('h'));
-  _sliderZ->setValue(static_cast<Slice*>(_drawable)->getSlice('d'));
-  _spinZ->setValue(static_cast<Slice*>(_drawable)->getSlice('d'));
-  _sliderA->setValue((int)(static_cast<Slice*>(_drawable)->getAlpha()*100));
+  _sliderX->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('w'));
+  _spinX->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('w'));
+  _sliderY->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('h'));
+  _spinY->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('h'));
+  _sliderZ->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('d'));
+  _spinZ->setValue(static_cast<SliceDrawable*>(_drawable)->getSlice('d'));
+  _sliderA->setValue((int)(static_cast<SliceDrawable*>(_drawable)->getAlpha()*100));
   
   _layout->addWidget(_checkX,0,0);
   _layout->addWidget(_spinX,0,1,1,1, Qt::AlignRight);
@@ -395,7 +397,7 @@ SliceControlPanel::SliceControlPanel(Drawable* d, QWidget* parent) :
 }
 
 
-SliceControlPanel::~SliceControlPanel()
+SliceDrawableControlPanel::~SliceDrawableControlPanel()
 {
   delete _layout;
   delete _checkX;
@@ -412,43 +414,43 @@ SliceControlPanel::~SliceControlPanel()
 }
 
 
-void SliceControlPanel::changeSliceX(int id)
+void SliceDrawableControlPanel::changeSliceX(int id)
 {
-  static_cast<Slice*>(_drawable)->changeSlice('w', id);
+  static_cast<SliceDrawable*>(_drawable)->changeSlice('w', id);
 }
 
-void SliceControlPanel::changeSliceY(int id)
+void SliceDrawableControlPanel::changeSliceY(int id)
 {
-  static_cast<Slice*>(_drawable)->changeSlice('h', id);
+  static_cast<SliceDrawable*>(_drawable)->changeSlice('h', id);
 }
 
-void SliceControlPanel::changeSliceZ(int id)
+void SliceDrawableControlPanel::changeSliceZ(int id)
 {
-  static_cast<Slice*>(_drawable)->changeSlice('d', id);
+  static_cast<SliceDrawable*>(_drawable)->changeSlice('d', id);
 }
 
-void SliceControlPanel::changeAlpha(int id)
+void SliceDrawableControlPanel::changeAlpha(int id)
 {
-  static_cast<Slice*>(_drawable)->setAlpha(id/100.);
+  static_cast<SliceDrawable*>(_drawable)->setAlpha(id/100.);
 }
 
-void SliceControlPanel::setSliceVisibleX(int state)
+void SliceDrawableControlPanel::setSliceVisibleX(int state)
 {
-  static_cast<Slice*>(_drawable)->setVisible(0, state);
+  static_cast<SliceDrawable*>(_drawable)->setVisible(0, state);
 }
 
-void SliceControlPanel::setSliceVisibleY(int state)
+void SliceDrawableControlPanel::setSliceVisibleY(int state)
 {
-  static_cast<Slice*>(_drawable)->setVisible(1, state);
+  static_cast<SliceDrawable*>(_drawable)->setVisible(1, state);
 }
 
-void SliceControlPanel::setSliceVisibleZ(int state)
+void SliceDrawableControlPanel::setSliceVisibleZ(int state)
 {
-  static_cast<Slice*>(_drawable)->setVisible(2, state);
+  static_cast<SliceDrawable*>(_drawable)->setVisible(2, state);
 }
 
-void SliceControlPanel::setMaxInt(int state)
+void SliceDrawableControlPanel::setMaxInt(int state)
 {
-  static_cast<Slice*>(_drawable)->setMaxInt(state);
+  static_cast<SliceDrawable*>(_drawable)->setMaxInt(state);
 }
 
